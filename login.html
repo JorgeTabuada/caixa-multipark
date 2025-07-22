@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Caixa Multipark</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/additional-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -37,11 +36,6 @@
             color: #007bff;
             margin-bottom: 10px;
             font-size: 28px;
-        }
-        
-        .login-header p {
-            color: #6c757d;
-            margin-bottom: 0;
         }
         
         .form-group {
@@ -87,11 +81,6 @@
             background-color: #0056b3;
         }
         
-        .btn-login:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-        
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
@@ -101,13 +90,11 @@
         
         .alert-danger {
             background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
             color: #721c24;
         }
         
         .alert-success {
             background-color: #d4edda;
-            border: 1px solid #c3e6cb;
             color: #155724;
         }
         
@@ -125,40 +112,7 @@
             to { transform: rotate(360deg); }
         }
         
-        .hidden {
-            display: none;
-        }
-        
-        .forgot-password {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .forgot-password a {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        .register-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -167,7 +121,7 @@
             <div class="login-header">
                 <i class="fas fa-parking fa-3x" style="color: #007bff; margin-bottom: 15px;"></i>
                 <h1>Caixa Multipark</h1>
-                <p>Faça login para continuar</p>
+                <p>Faz login para continuar</p>
             </div>
             
             <div id="alert-container"></div>
@@ -188,14 +142,6 @@
                     <span id="loading-spinner" class="loading-spinner hidden"></span>
                 </button>
             </form>
-            
-            <div class="forgot-password">
-                <a href="#" id="forgot-password-link">Esqueceu a password?</a>
-            </div>
-            
-            <div class="register-link">
-                <p>Não tem conta? <a href="#" id="register-link">Contacte o administrador</a></p>
-            </div>
         </div>
     </div>
 
@@ -214,8 +160,6 @@
         const loginText = document.getElementById('login-text');
         const loadingSpinner = document.getElementById('loading-spinner');
         const alertContainer = document.getElementById('alert-container');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        const registerLink = document.getElementById('register-link');
         
         // Verificar se já está logado
         document.addEventListener('DOMContentLoaded', async () => {
@@ -235,11 +179,6 @@
             `;
         }
         
-        // Função para limpar alertas
-        function clearAlert() {
-            alertContainer.innerHTML = '';
-        }
-        
         // Função para mostrar/esconder loading
         function setLoading(loading) {
             if (loading) {
@@ -256,13 +195,12 @@
         // Evento de login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearAlert();
             
             const email = emailInput.value.trim();
             const password = passwordInput.value;
             
             if (!email || !password) {
-                showAlert('Por favor, preencha todos os campos');
+                showAlert('Por favor, preenche todos os campos');
                 return;
             }
             
@@ -274,51 +212,19 @@
                     password: password
                 });
                 
-                if (error) {
-                    throw error;
-                }
-                
-                // Verificar se o utilizador existe na tabela users
-                const { data: userData, error: userError } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('id', data.user.id)
-                    .single();
-                
-                if (userError && userError.code === 'PGRST116') {
-                    // Utilizador não existe na tabela users, criar entrada
-                    const { error: insertError } = await supabaseClient
-                        .from('users')
-                        .insert({
-                            id: data.user.id,
-                            email: data.user.email,
-                            full_name: data.user.user_metadata?.full_name || '',
-                            role: 'user'
-                        });
-                    
-                    if (insertError) {
-                        console.error('Erro ao criar utilizador na BD:', insertError);
-                    }
-                }
+                if (error) throw error;
                 
                 showAlert('Login realizado com sucesso!', 'success');
                 
-                // Redirecionar após 1 segundo
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1000);
                 
             } catch (error) {
-                console.error('Erro de login:', error);
-                
-                let errorMessage = 'Erro ao fazer login. Tente novamente.';
+                let errorMessage = 'Erro ao fazer login. Tenta novamente.';
                 
                 if (error.message.includes('Invalid login credentials')) {
                     errorMessage = 'Email ou password incorretos.';
-                } else if (error.message.includes('Email not confirmed')) {
-                    errorMessage = 'Por favor, confirme o seu email antes de fazer login.';
-                } else if (error.message.includes('Too many requests')) {
-                    errorMessage = 'Muitas tentativas de login. Tente novamente mais tarde.';
                 }
                 
                 showAlert(errorMessage);
@@ -327,42 +233,10 @@
             }
         });
         
-        // Reset de password
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            const email = emailInput.value.trim();
-            if (!email) {
-                showAlert('Por favor, insira o seu email primeiro');
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/reset-password.html'
-                });
-                
-                if (error) throw error;
-                
-                showAlert('Email de recuperação enviado! Verifique a sua caixa de entrada.', 'success');
-                
-            } catch (error) {
-                console.error('Erro ao enviar reset de password:', error);
-                showAlert('Erro ao enviar email de recuperação. Tente novamente.');
-            }
-        });
-        
-        // Registo (placeholder)
-        registerLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showAlert('Por favor, contacte o administrador para criar uma nova conta.', 'info');
-        });
-        
-        console.log('🔐 Sistema de autenticação carregado!');
-        console.log('Utilizadores de teste disponíveis:');
+        // Utilizadores de teste
+        console.log('🔐 Utilizadores de teste:');
         console.log('- admin@multipark.com / admin123');
         console.log('- user@multipark.com / user123');
-        console.log('- manager@multipark.com / manager123');
     </script>
 </body>
 </html>
