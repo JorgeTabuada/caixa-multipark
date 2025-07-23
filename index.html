@@ -5,531 +5,262 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caixa Multipark</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/additional-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Scripts do Supabase -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <!-- Scripts de bibliotecas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <!-- Loading inicial -->
-    <div id="app-loading" class="loading-overlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <h3>Caixa Multipark</h3>
-            <p>A inicializar aplicação...</p>
-        </div>
-    </div>
-
-    <!-- Aplicação principal -->
-    <div id="main-app" class="hidden">
-        <!-- Cabeçalho -->
-        <header class="header">
-            <div class="container">
-                <div class="auth-header">
-                    <div class="logo">
-                        <i class="fas fa-parking fa-2x"></i>
-                        <h1>Caixa Multipark</h1>
-                    </div>
-                    <div class="user-info">
-                        <span id="user-email">utilizador@exemplo.com</span>
-                        <button class="refresh-btn" id="refresh-dashboard" title="Atualizar Dados">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="logout-btn" id="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i> Sair
-                        </button>
-                    </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-parking fa-2x"></i>
+                    <h1>Caixa Multipark</h1>
                 </div>
                 <div class="session-info">
-                    <span id="current-date">21/07/2025</span>
-                    <span id="last-sync">Última sincronização: --:--</span>
+                    <span id="current-date">23/07/2025</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Navegação -->
-        <div class="container">
-            <nav class="nav-tabs">
-                <div class="nav-tab active" data-tab="import">Importação de Arquivos</div>
-                <div class="nav-tab" data-tab="compare">Comparação Odoo vs Back Office</div>
-                <div class="nav-tab" data-tab="validate">Validação de Caixa</div>
-                <div class="nav-tab" data-tab="dashboard">Dashboard e Estatísticas</div>
-                <div class="nav-tab" data-tab="export">Exportação</div>
-            </nav>
+    <!-- Navegação -->
+    <div class="container">
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="import">Importação de Arquivos</div>
+            <div class="nav-tab" data-tab="compare">Comparação Odoo vs Back Office</div>
+            <div class="nav-tab" data-tab="validate">Validação de Caixa</div>
+            <div class="nav-tab" data-tab="dashboard">Dashboard e Estatísticas</div>
+            <div class="nav-tab" data-tab="export">Exportação</div>
+        </nav>
 
-            <!-- Conteúdo Principal -->
-            <main class="main-content">
-                <!-- Seção de Importação de Arquivos -->
-                <section id="import-section" class="content-section active">
-                    <h2 class="card-title mb-20">Importação de Arquivos</h2>
-                    
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Arquivo Odoo (Sales Orders)</h3>
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Seção de Importação de Arquivos -->
+            <section id="import-section" class="content-section active">
+                <h2 class="card-title mb-20">Importação de Arquivos</h2>
+                
+                <div class="card mb-20">
+                    <div class="card-header">
+                        <h3 class="card-title">Arquivo Odoo (Sales Orders)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="file-upload" id="odoo-upload">
+                            <i class="fas fa-file-excel file-upload-icon"></i>
+                            <p class="file-upload-text">Arraste e solte o arquivo Odoo aqui ou clique para selecionar</p>
+                            <input type="file" id="odoo-file" class="hidden" accept=".xlsx, .xls">
+                            <button class="btn btn-primary">Selecionar Arquivo</button>
                         </div>
-                        <div class="card-body">
-                            <div class="file-upload" id="odoo-upload">
-                                <i class="fas fa-file-excel file-upload-icon"></i>
-                                <p class="file-upload-text">Arraste e solte o arquivo Odoo aqui ou clique para selecionar</p>
-                                <input type="file" id="odoo-file" class="hidden" accept=".xlsx, .xls">
-                                <button class="btn btn-primary">Selecionar Arquivo</button>
-                            </div>
-                            <div id="odoo-file-info" class="hidden">
-                                <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="odoo-filename"></span></p>
-                            </div>
+                        <div id="odoo-file-info" class="hidden">
+                            <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="odoo-filename"></span></p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Arquivo Back Office (Deliveries)</h3>
+                <div class="card mb-20">
+                    <div class="card-header">
+                        <h3 class="card-title">Arquivo Back Office (Deliveries)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="file-upload" id="backoffice-upload">
+                            <i class="fas fa-file-excel file-upload-icon"></i>
+                            <p class="file-upload-text">Arraste e solte o arquivo Back Office aqui ou clique para selecionar</p>
+                            <input type="file" id="backoffice-file" class="hidden" accept=".xlsx, .xls">
+                            <button class="btn btn-primary">Selecionar Arquivo</button>
                         </div>
-                        <div class="card-body">
-                            <div class="file-upload" id="backoffice-upload">
-                                <i class="fas fa-file-excel file-upload-icon"></i>
-                                <p class="file-upload-text">Arraste e solte o arquivo Back Office aqui ou clique para selecionar</p>
-                                <input type="file" id="backoffice-file" class="hidden" accept=".xlsx, .xls">
-                                <button class="btn btn-primary">Selecionar Arquivo</button>
-                            </div>
-                            <div id="backoffice-file-info" class="hidden">
-                                <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="backoffice-filename"></span></p>
-                            </div>
+                        <div id="backoffice-file-info" class="hidden">
+                            <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="backoffice-filename"></span></p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex flex-center mt-20">
-                        <button id="process-files-btn" class="btn btn-primary" disabled>Processar Arquivos</button>
+                <div class="flex flex-center mt-20">
+                    <button id="process-files-btn" class="btn btn-primary" disabled>Processar Arquivos</button>
+                </div>
+            </section>
+
+            <!-- Seção de Comparação Odoo vs Back Office -->
+            <section id="compare-section" class="content-section">
+                <h2 class="card-title mb-20">Comparação Odoo vs Back Office</h2>
+                
+                <div class="card mb-20">
+                    <div class="card-header">
+                        <h3 class="card-title">Resumo da Comparação</h3>
                     </div>
-                </section>
-
-                <!-- Seção de Comparação Odoo vs Back Office -->
-                <section id="compare-section" class="content-section">
-                    <h2 class="card-title mb-20">Comparação Odoo vs Back Office</h2>
-                    
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Resumo da Comparação</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="flex flex-between mb-10">
-                                <div>
-                                    <p>Total de registros no Odoo: <strong id="odoo-count">0</strong></p>
-                                    <p>Total de registros no Back Office: <strong id="backoffice-count">0</strong></p>
-                                </div>
-                                <div>
-                                    <p>Registros com inconsistências: <strong id="inconsistency-count" class="status-error">0</strong></p>
-                                    <p>Registros ausentes: <strong id="missing-count" class="status-warning">0</strong></p>
-                                </div>
+                    <div class="card-body">
+                        <div class="flex">
+                            <div style="margin-right: 40px;">
+                                <p>Total de registros no Odoo: <strong id="odoo-count">0</strong></p>
+                                <p>Total de registros no Back Office: <strong id="backoffice-count">0</strong></p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Registros</h3>
                             <div>
-                                <button class="btn btn-secondary" id="show-all-btn">Todos</button>
-                                <button class="btn btn-warning" id="show-missing-btn">Ausentes</button>
-                                <button class="btn btn-danger" id="show-inconsistent-btn">Inconsistentes</button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table class="table" id="comparison-table">
-                                <thead>
-                                    <tr>
-                                        <th>Matrícula</th>
-                                        <th>Alocação</th>
-                                        <th>Preço Booking (BO)</th>
-                                        <th>Preço Booking (Odoo)</th>
-                                        <th>Marca</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="7" class="text-center">Nenhum dado disponível. Importe os arquivos primeiro.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-center mt-20">
-                        <button id="validate-comparison-btn" class="btn btn-primary" disabled>Validar e Avançar</button>
-                    </div>
-                </section>
-
-                <!-- Seção de Validação de Caixa -->
-                <section id="validate-section" class="content-section">
-                    <h2 class="card-title mb-20">Validação de Caixa</h2>
-                    
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Arquivo de Caixa</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="file-upload" id="caixa-upload">
-                                <i class="fas fa-file-excel file-upload-icon"></i>
-                                <p class="file-upload-text">Arraste e solte o arquivo de Caixa aqui ou clique para selecionar</p>
-                                <input type="file" id="caixa-file" class="hidden" accept=".xlsx, .xls">
-                                <button class="btn btn-primary">Selecionar Arquivo</button>
-                            </div>
-                            <div id="caixa-file-info" class="hidden">
-                                <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="caixa-filename"></span></p>
+                                <p>Registros com inconsistências: <strong id="inconsistency-count" style="color: var(--danger-color);">0</strong></p>
+                                <p>Registros ausentes: <strong id="missing-count" style="color: var(--warning-color);">0</strong></p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card mb-20 hidden" id="driver-selection">
-                        <div class="card-header">
-                            <h3 class="card-title">Selecionar Condutor</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label for="driver-select" class="form-label">Condutor:</label>
-                                <select id="driver-select" class="form-control">
-                                    <option value="">Selecione um condutor</option>
-                                </select>
-                            </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Registros</h3>
+                        <div>
+                            <button class="btn btn-secondary filter-button active" id="show-all-btn">Todos</button>
+                            <button class="btn btn-secondary filter-button" id="show-missing-btn">Ausentes</button>
+                            <button class="btn btn-secondary filter-button" id="show-inconsistent-btn">Inconsistentes</button>
                         </div>
                     </div>
+                    <div class="table-container">
+                        <table class="table" id="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Matrícula</th>
+                                    <th>Alocação</th>
+                                    <th>Preço Booking (BO)</th>
+                                    <th>Preço Booking (Odoo)</th>
+                                    <th>Marca</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center">Nenhum dado disponível. Importe os arquivos primeiro.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                    <div class="card hidden" id="driver-deliveries">
-                        <div class="card-header">
-                            <h3 class="card-title">Entregas do Condutor</h3>
-                            <div id="driver-summary">
-                                <p>Total de entregas: <strong id="delivery-count">0</strong></p>
-                            </div>
+                <div class="flex flex-center mt-20">
+                    <button id="validate-comparison-btn" class="btn btn-primary" disabled>Validar e Avançar</button>
+                </div>
+            </section>
+
+            <!-- Seção de Validação de Caixa -->
+            <section id="validate-section" class="content-section">
+                <h2 class="card-title mb-20">Validação de Caixa</h2>
+                
+                <div class="card mb-20">
+                    <div class="card-header">
+                        <h3 class="card-title">Arquivo de Caixa</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="file-upload" id="caixa-upload">
+                            <i class="fas fa-file-excel file-upload-icon"></i>
+                            <p class="file-upload-text">Arraste e solte o arquivo de Caixa aqui ou clique para selecionar</p>
+                            <input type="file" id="caixa-file" class="hidden" accept=".xlsx, .xls">
+                            <button class="btn btn-primary">Selecionar Arquivo</button>
                         </div>
-                        <div class="table-container">
-                            <table class="table" id="deliveries-table">
-                                <thead>
-                                    <tr>
-                                        <th>Alocação</th>
-                                        <th>Matrícula</th>
-                                        <th>Data Checkout</th>
-                                        <th>Método Pagamento</th>
-                                        <th>Valor</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                        <div id="caixa-file-info" class="hidden">
+                            <p><i class="fas fa-check-circle" style="color: green;"></i> Arquivo selecionado: <span id="caixa-filename"></span></p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex flex-between mt-20">
-                        <button id="add-caixa-btn" class="btn btn-secondary hidden">Adicionar Nova Folha de Caixa</button>
+                <div class="card hidden" id="driver-selection">
+                    <div class="card-header">
+                        <h3 class="card-title">Selecionar Condutor</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="driver-select" class="form-label">Condutor:</label>
+                            <select id="driver-select" class="form-control">
+                                <option value="">Selecione um condutor</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="driver-deliveries">
+                    <div class="card-header">
+                        <h3 class="card-title">Entregas do Condutor</h3>
+                        <div id="driver-summary">
+                            <p>Total de entregas: <strong id="delivery-count">0</strong></p>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="table" id="deliveries-table">
+                            <thead>
+                                <tr>
+                                    <th>Alocação</th>
+                                    <th>Matrícula</th>
+                                    <th>Data Checkout</th>
+                                    <th>Método Pagamento</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex mt-20">
+                    <button id="add-caixa-btn" class="btn btn-secondary hidden">Adicionar Nova Folha de Caixa</button>
+                    <div style="margin-left: auto;">
                         <button id="close-caixa-btn" class="btn btn-primary hidden">Encerrar Caixa</button>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Seção de Dashboard e Estatísticas -->
-                <section id="dashboard-section" class="content-section">
-                    <h2 class="card-title mb-20">Dashboard e Estatísticas</h2>
-                    
-                    <!-- Card para estatísticas de entregas efetuadas vs previstas -->
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Entregas Efetuadas vs Previstas</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="flex flex-between">
-                                <div>
-                                    <p>Entregas Efetuadas: <strong id="entregas-efetuadas">0</strong></p>
-                                    <p>Entregas Previstas: <strong id="entregas-previstas">0</strong></p>
-                                </div>
-                                <div>
-                                    <p>Percentual de Conclusão: <strong id="percentual-entregas" class="status-warning">0%</strong></p>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Seção de Dashboard e Estatísticas -->
+            <section id="dashboard-section" class="content-section">
+                <h2 class="card-title mb-20">Dashboard e Estatísticas</h2>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Estatísticas</h3>
                     </div>
-                    
-                    <div class="flex flex-between mb-20">
-                        <div class="card" style="width: 32%;">
-                            <div class="card-header">
-                                <h3 class="card-title">Resumo da Caixa</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Total da Caixa: <strong id="total-caixa">0,00 €</strong></p>
-                                <p>Total em Numerário: <strong id="total-numerario">0,00 €</strong></p>
-                                <p>Total em Multibanco: <strong id="total-multibanco">0,00 €</strong></p>
-                                <p>Total No Pay: <strong id="total-nopay">0,00 €</strong></p>
-                                <p>Total Online: <strong id="total-online">0,00 €</strong></p>
-                            </div>
-                        </div>
-                        
-                        <div class="card" style="width: 32%;">
-                            <div class="card-header">
-                                <h3 class="card-title">Entregas por Método</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Entregas em Numerário: <strong id="count-numerario">0</strong></p>
-                                <p>Entregas em Multibanco: <strong id="count-multibanco">0</strong></p>
-                                <p>Entregas No Pay: <strong id="count-nopay">0</strong></p>
-                                <p>Entregas Online: <strong id="count-online">0</strong></p>
-                                <p>Total de Entregas: <strong id="count-total">0</strong></p>
-                            </div>
-                        </div>
-                        
-                        <div class="card" style="width: 32%;">
-                            <div class="card-header">
-                                <h3 class="card-title">Comparativo</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Caixa Prevista (BO): <strong id="previsto-bo">0,00 €</strong></p>
-                                <p>Caixa Prevista (Odoo): <strong id="previsto-odoo">0,00 €</strong></p>
-                                <p>Caixa Efetiva: <strong id="efetiva-caixa">0,00 €</strong></p>
-                                <p>Diferença: <strong id="diferenca-caixa">0,00 €</strong></p>
-                            </div>
-                        </div>
+                    <div class="card-body">
+                        <p class="text-center">Dados serão exibidos após processamento dos arquivos.</p>
                     </div>
-                    
-                    <!-- Card para estatísticas por condutor -->
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Estatísticas por Condutor</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="condutor-stats-container">
-                                <p class="text-center">A carregar estatísticas...</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Gráficos</h3>
-                        </div>
-                        <div class="card-body flex flex-between">
-                            <div style="width: 48%;">
-                                <canvas id="chart-brands"></canvas>
-                            </div>
-                            <div style="width: 48%;">
-                                <canvas id="chart-payments"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Todas as Entregas</h3>
-                        </div>
-                        <div class="table-container">
-                            <table class="table" id="all-deliveries-table">
-                                <thead>
-                                    <tr>
-                                        <th>Matrícula</th>
-                                        <th>Data</th>
-                                        <th>Marca</th>
-                                        <th>Método Pagamento</th>
-                                        <th>Valor</th>
-                                        <th>Condutor</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Seção de Exportação -->
-                <section id="export-section" class="content-section">
-                    <h2 class="card-title mb-20">Exportação</h2>
-                    
-                    <div class="card mb-20">
-                        <div class="card-header">
-                            <h3 class="card-title">Exportar Dados</h3>
-                        </div>
-                        <div class="card-body">
-                            <p>Exporte os dados processados para um arquivo Excel.</p>
-                            <div class="flex flex-center mt-20">
-                                <button id="export-btn" class="btn btn-primary">Exportar para Excel</button>
-                            </div>
+            <!-- Seção de Exportação -->
+            <section id="export-section" class="content-section">
+                <h2 class="card-title mb-20">Exportação</h2>
+                
+                <div class="card mb-20">
+                    <div class="card-header">
+                        <h3 class="card-title">Exportar Dados</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Exporte os dados processados para um arquivo Excel.</p>
+                        <div class="flex flex-center mt-20">
+                            <button id="export-btn" class="btn btn-primary" disabled>Exportar para Excel</button>
                         </div>
                     </div>
-                    
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Histórico de Exportações</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="export-history">
-                                <p class="text-center">A carregar histórico...</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        </div>
-    </div>
-
-    <!-- Status de conexão -->
-    <div id="connection-status" class="connection-status connected">
-        <i class="fas fa-wifi"></i> Conectado ao Supabase
-    </div>
-
-    <!-- Modais -->
-    <div class="modal-overlay" id="details-modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Detalhes do Registro</h3>
-                <button class="modal-close" onclick="document.getElementById('details-modal-overlay').style.display = 'none';">&times;</button>
-            </div>
-            <div class="modal-body" id="details-modal-body"></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="edit-modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Resolver Problema</h3>
-                <button class="modal-close" onclick="document.getElementById('edit-modal-overlay').style.display = 'none';">&times;</button>
-            </div>
-            <div class="modal-body" id="edit-modal-body"></div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="save-resolution-btn">Salvar</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('edit-modal-overlay').style.display = 'none';">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="validate-modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Validar Entrega</h3>
-                <button class="modal-close" onclick="document.getElementById('validate-modal-overlay').style.display = 'none';">&times;</button>
-            </div>
-            <div class="modal-body" id="validate-modal-body"></div>
-        </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- Scripts da aplicação -->
     <script src="js/utils.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/supabase-integration.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/fileProcessor.js"></script>
+    <script src="js/fileProcessor-debug.js"></script>
     <script src="js/comparator.js"></script>
-    <script src="js/validation-system.js"></script>
-    <script src="js/dashboard-supabase.js"></script>
-    <script src="js/exporter.js"></script>
-    <script src="js/advanced-exporter.js"></script>
     
     <script>
         // Inicialização da aplicação
-        document.addEventListener('DOMContentLoaded', async function() {
-            const appLoading = document.getElementById('app-loading');
-            const mainApp = document.getElementById('main-app');
-            const userEmailElement = document.getElementById('user-email');
-            const currentDateElement = document.getElementById('current-date');
-            const lastSyncElement = document.getElementById('last-sync');
-            const logoutBtn = document.getElementById('logout-btn');
-            const refreshDashboardBtn = document.getElementById('refresh-dashboard');
-            const connectionStatus = document.getElementById('connection-status');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Caixa Multipark carregado!');
+            console.log('💡 Para debug, abre a consola (F12) e usa:');
+            console.log('   window.fileProcessor.debugData() - Ver estado dos dados');
+            console.log('   window.fileProcessor.showColumns("odoo") - Ver colunas do Odoo');
+            console.log('   window.fileProcessor.showColumns("backoffice") - Ver colunas do Back Office');
             
-            try {
-                // Aguardar carregamento do Supabase e API
-                await new Promise(resolve => {
-                    const checkAPI = () => {
-                        if (window.caixaAPI && window.supabase) {
-                            resolve();
-                        } else {
-                            setTimeout(checkAPI, 100);
-                        }
-                    };
-                    checkAPI();
-                });
-                
-                // Verificar autenticação
-                await window.caixaAPI.initialize();
-                
-                if (window.caixaAPI.currentUser) {
-                    // Usuário autenticado, mostrar aplicação
-                    userEmailElement.textContent = window.caixaAPI.currentUser.email;
-                    
-                    // Configurar data atual
-                    const today = new Date();
-                    currentDateElement.textContent = today.toLocaleDateString('pt-PT');
-                    
-                    // Configurar última sincronização
-                    const now = new Date();
-                    lastSyncElement.textContent = `Última sincronização: ${now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
-                    
-                    // Mostrar aplicação principal
-                    appLoading.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-                    
-                    // Status de conexão
-                    connectionStatus.className = 'connection-status connected';
-                    connectionStatus.innerHTML = '<i class="fas fa-wifi"></i> Conectado ao Supabase';
-                    
-                    console.log('✅ Aplicação inicializada com sucesso!');
-                } else {
-                    // Não autenticado, redirecionar para login
-                    window.location.href = 'login.html';
-                }
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                
-                // Status de conexão error
-                connectionStatus.className = 'connection-status disconnected';
-                connectionStatus.innerHTML = '<i class="fas fa-wifi-slash"></i> Erro de conexão';
-                
-                // Mostrar erro
-                const loadingContent = document.querySelector('.loading-content');
-                loadingContent.innerHTML = `
-                    <div style="color: #f44336;">
-                        <i class="fas fa-exclamation-triangle fa-2x" style="margin-bottom: 15px;"></i>
-                        <h3>Erro de Inicialização</h3>
-                        <p>${error.message}</p>
-                        <button onclick="window.location.reload()" class="btn btn-primary">Tentar Novamente</button>
-                    </div>
-                `;
-            }
-            
-            // Evento de logout
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', async () => {
-                    try {
-                        await window.caixaAPI.logout();
-                    } catch (error) {
-                        console.error('Erro no logout:', error);
-                    }
-                });
-            }
-            
-            // Evento de refresh do dashboard
-            if (refreshDashboardBtn) {
-                refreshDashboardBtn.addEventListener('click', async () => {
-                    try {
-                        refreshDashboardBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        
-                        if (window.dashboard && window.dashboard.refreshDashboard) {
-                            await window.dashboard.refreshDashboard();
-                        }
-                        
-                        // Atualizar timestamp
-                        const now = new Date();
-                        lastSyncElement.textContent = `Última sincronização: ${now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
-                        
-                        refreshDashboardBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-                    } catch (error) {
-                        console.error('Erro no refresh:', error);
-                        refreshDashboardBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-                    }
-                });
-            }
+            // Mostrar notificação de boas-vindas
+            setTimeout(() => {
+                showSuccess('Sistema carregado! Comece por importar os ficheiros Odoo e Back Office.');
+            }, 1000);
         });
     </script>
 </body>
