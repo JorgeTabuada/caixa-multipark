@@ -1,141 +1,93 @@
 # 🚗 Caixa Multipark
 
-Sistema completo de gestão de caixa e validação de entregas para a Multipark.
+Sistema web para gestão e validação de caixa de entregas de estacionamento. Integra dados do Odoo, Back Office e folhas de caixa dos condutores para validação automática e geração de relatórios.
 
-## 🚀 Funcionalidades
+## 📊 Funcionalidades
 
-- ✅ **Importação de Ficheiros Excel** (Odoo, Back Office, Caixa)
-- 🔍 **Comparação Automática** entre sistemas
-- ✔️ **Validação de Entregas** por condutor
-- 📊 **Dashboard** com estatísticas em tempo real
-- 📤 **Exportação** para Excel com múltiplos templates
-- 🔐 **Autenticação** segura com Supabase
-- 💾 **Armazenamento** persistente de dados
+- **Importação de Ficheiros Excel** - Suporte para Odoo, Back Office e Caixa
+- **Comparação Automática** - Deteta inconsistências entre sistemas
+- **Validação por Condutor** - Interface para validação manual
+- **Dashboard Interativo** - Estatísticas em tempo real
+- **Exportação para Excel** - Relatórios completos
+- **Sistema de Debug** - Logs detalhados para resolução de problemas
 
-## 🛠️ Configuração Rápida
+## 🚀 Como Usar
 
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/JorgeTabuada/caixa-multipark.git
-cd caixa-multipark
+### 1. Abrir a Aplicação
+```
+https://jorgetabuada.github.io/caixa-multipark/
 ```
 
-### 2. Configurar Supabase
+### 2. Fluxo de Trabalho
+1. **Importar** ficheiros Odoo e Back Office (aba "Importação")
+2. **Comparar** dados entre sistemas (aba "Comparação")
+3. **Resolver** inconsistências se existirem
+4. **Importar** ficheiro de caixa (aba "Validação")
+5. **Validar** entregas por condutor
+6. **Ver** dashboard com estatísticas (aba "Dashboard")
+7. **Exportar** relatório final (aba "Exportação")
 
-1. Vai a [supabase.com](https://supabase.com) e cria um projeto
-2. Copia a URL e chave da API
-3. Executa o schema em `docs/supabase-schema.sql`
-4. Atualiza as credenciais em `js/supabase-integration.js`
+### 3. Formatos de Ficheiro Suportados
+- **Odoo**: Ficheiros Excel com colunas como `imma`, `price`, `parking_name`
+- **Back Office**: Ficheiros Excel com colunas como `licensePlate`, `alocation`, `bookingPrice`
+- **Caixa**: Ficheiros Excel com dados de entregas dos condutores
 
-### 3. Servir a Aplicação
+## 🔧 Para Programadores
 
-```bash
-# Usar qualquer servidor local, por exemplo:
-python -m http.server 8000
-# ou
-npx serve .
-# ou
-php -S localhost:8000
+### Estrutura do Projeto
 ```
-
-### 4. Aceder à Aplicação
-
-Abre `http://localhost:8000` no browser.
-
-**Utilizadores de teste:**
-- `admin@multipark.com` / `admin123`
-- `user@multipark.com` / `user123`
-
-## 📂 Estrutura do Projeto
-
-```
-├── index.html              # Aplicação principal
-├── login.html              # Página de login
+/
+├── index.html          # Página principal
+├── login.html           # Página de login
 ├── css/
-│   ├── styles.css          # Estilos principais
-│   └── additional-styles.css # Estilos complementares
-├── js/
-│   ├── app.js              # Inicialização
-│   ├── supabase-integration.js # API Supabase
-│   ├── fileProcessor.js    # Processamento de ficheiros
-│   ├── comparator.js       # Comparação de dados
-│   ├── validator.js        # Validação de entregas
-│   ├── dashboard-supabase.js # Dashboard integrado
-│   ├── exporter.js         # Exportação básica
-│   ├── advanced-exporter.js # Exportação avançada
-│   ├── utils.js            # Utilitários
-│   ├── notifications.js    # Sistema de notificações
-│   └── validation-system.js # Sistema de validação
-└── docs/
-    └── supabase-schema.sql # Schema da base de dados
+│   └── styles.css       # Estilos principais
+└── js/
+    ├── app.js              # Aplicação principal
+    ├── fileProcessor-debug.js  # Processamento de ficheiros (DEBUG)
+    ├── comparator.js       # Comparação entre sistemas
+    └── utils.js            # Funções utilitárias
 ```
 
-## 🎯 Como Usar
-
-### 1. Importação
-1. Faz login na aplicação
-2. Vai ao tab "Importação de Arquivos"
-3. Carrega os ficheiros Odoo e Back Office
-4. Clica "Processar Arquivos"
-
-### 2. Comparação
-1. Revê as inconsistências encontradas
-2. Resolve os problemas usando os botões "Resolver"
-3. Clica "Validar e Avançar"
-
-### 3. Validação de Caixa
-1. Carrega o ficheiro de caixa
-2. Seleciona um condutor
-3. Valida cada entrega individualmente
-4. Clica "Encerrar Caixa"
-
-### 4. Dashboard e Exportação
-1. Vê as estatísticas no dashboard
-2. Exporta relatórios em Excel
-3. Consulta histórico de exportações
-
-## 🔧 Configuração Avançada
-
-### Variáveis de Ambiente (Supabase)
-
-Edita `js/supabase-integration.js`:
+### Sistema de Debug
+O `fileProcessor-debug.js` inclui logs detalhados:
 
 ```javascript
-const SUPABASE_URL = 'https://teu-projeto.supabase.co';
-const SUPABASE_ANON_KEY = 'tua-chave-aqui';
+// Ver estado dos dados
+window.fileProcessor.debugData()
+
+// Ver colunas de um ficheiro
+window.fileProcessor.showColumns('odoo')
+window.fileProcessor.showColumns('backoffice')
 ```
 
-### Personalização de Templates
-
-Os templates de exportação podem ser personalizados em `js/advanced-exporter.js`.
+### Deteção Flexível de Colunas
+O sistema deteta automaticamente colunas com nomes variados:
+- **Matrícula**: `imma`, `licensePlate`, `matricula`, `placa`
+- **Preço**: `price`, `booking_price`, `valor`, `preco`
+- **Marca**: `parking_name`, `parkBrand`, `marca`
 
 ## 🐛 Resolução de Problemas
 
-### Erro de CORS
-Se tiveres problemas de CORS, usa um servidor local apropriado em vez de abrir o ficheiro diretamente.
+### Problema: Ficheiros não são lidos
+1. Abre a **Consola do Browser** (F12)
+2. Procura por mensagens como:
+   ```
+   🔍 Colunas disponíveis no Odoo: ["col1", "col2", ...]
+   ❌ Não foi possível encontrar coluna de matrícula
+   ```
+3. Verifica se as colunas do ficheiro têm nomes reconhecíveis
+4. Se necessário, renomeia as colunas no Excel antes de importar
 
-### Problemas de Autenticação
-Certifica-te que as credenciais do Supabase estão corretas e que o RLS está configurado.
+### Logs úteis
+- `🔵 Ficheiro Odoo selecionado` - Ficheiro carregado
+- `📊 Workbook carregado` - Excel processado
+- `🎯 Correspondência encontrada` - Coluna mapeada com sucesso
+- `✅ Dados processados` - Dados transformados
 
-### Ficheiros não Carregam
-Verifica se os ficheiros Excel estão no formato correto (.xlsx).
+## 📞 Contacto
 
-## 📝 Contribuir
-
-1. Faz fork do projeto
-2. Cria uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit as mudanças (`git commit -am 'Adicionar nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abre um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob licença MIT. Vê o ficheiro [LICENSE](LICENSE) para detalhes.
-
-## 🤝 Suporte
-
-Para suporte, abre uma issue no GitHub ou contacta a equipa de desenvolvimento.
+Para problemas ou sugestões, abre uma **Issue** no GitHub.
 
 ---
 
-Feito com ❤️ para a Multipark
+**Última atualização**: Sistema de debug melhorado e deteção flexível de colunas 🚀
